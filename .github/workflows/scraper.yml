@@ -2,7 +2,7 @@ name: News Scraper Workflow
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '* * * * *'
   workflow_dispatch: # 手動実行ボタンを表示
 
 jobs:
