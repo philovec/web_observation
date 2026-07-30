@@ -25,13 +25,38 @@ def save_state(state):
 
 def fetch_configs():
     print("📡 スプレッドシート(GAS API)から設定を取得中...")
-    resp = requests.get(GAS_API_URL, timeout=15)
-    resp.raise_for_status()
-    return resp.json()
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            resp = requests.get(GAS_API_URL, timeout=15)
+            resp.raise_for_status()
+            return resp.json()
+        except Exception as e:
+            print(
+                f"⚠️ GASからの取得に失敗しました (試行 {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2)  # 2秒待ってから再試行
+            else:
+                print("❌ 計3回の再試行に失敗しました。")
+                raise 
 
 def send_email_via_gas(email, subject, html_body):
     payload = {"email": email, "subject": subject, "htmlBody": html_body, "password": GAS_PASSWORD}
-    requests.post(GAS_API_URL, json=payload, timeout=15)
+    
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            resp = requests.post(GAS_API_URL, json=payload, timeout=15)
+            resp.raise_for_status()
+            return resp.json()
+        except Exception as e:
+            print(
+                f"⚠️ GASによるメール送信に失敗しました (試行 {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2)  # 2秒待ってから再試行
+            else:
+                print("❌ 計3回の再試行に失敗しました。")
+                raise 
 
 def parse_date(date_str):
     cleaned = re.sub(r'[^\d/.-]', '', date_str.replace('年', '/').replace('月', '/').replace('日', ''))
