@@ -8,10 +8,8 @@ import requests
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
-GAS_API_URL = "https://script.google.com/macros/s/AKfycbwkWjy_TvfDcmcSQ-j1itySSmYztbkgLG7OkmVv5Rqgd2IcE-v-22uMV5-18975GRIm/exec"
-GAS_PASSWORD = "mnnvfuoekvc~bsml"
-
-#GAS_API_URL = os.environ.get("GAS_API_URL")
+GAS_API_URL = os.environ.get("GAS_API_URL")
+GAS_PASSWORD = os.environ.get("GAS_PASSWORD")
 STATE_FILE = "last_state.json"
 HTML_FILE = "index.html"
 
