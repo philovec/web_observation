@@ -8,8 +8,8 @@ import requests
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
-GAS_API_URL = os.environ.get("GAS_API_URL")
-GAS_PASSWORD = os.environ.get("GAS_PASSWORD")
+GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwkWjy_TvfDcmcSQ-j1itySSmYztbkgLG7OkmVv5Rqgd2IcE-v-22uMV5-18975GRIm/exec'#os.environ.get("GAS_API_URL")
+GAS_PASSWORD = 'mnnvfuoekvc~bsml'#os.environ.get("GAS_PASSWORD")
 STATE_FILE = "last_state.json"
 HTML_FILE = "index.html"
 
@@ -46,10 +46,12 @@ def send_email_via_gas(email, subject, html_body):
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            resp = requests.post(GAS_API_URL, json=payload, timeout=15)
+            resp = requests.post(GAS_API_URL, json=payload, timeout=15, allow_redirects=True)
             resp.raise_for_status()
             return resp.json()
         except Exception as e:
+            if 'resp' in locals():
+                print(f"DEBUG: GAS Response Code: {resp.status_code}, Body: {resp.text}")
             print(
                 f"⚠️ GASによるメール送信に失敗しました (試行 {attempt + 1}/{max_retries}): {e}")
             if attempt < max_retries - 1:
