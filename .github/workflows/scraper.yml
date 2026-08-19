@@ -35,6 +35,7 @@ jobs:
       - name: Run Scraper Script
         env:
           GAS_API_URL: ${{ secrets.GAS_API_URL }}
+          GAS_PASSWORD: ${{ secrets.GAS_PASSWORD }}
         run: |
           python scraper.py
 
