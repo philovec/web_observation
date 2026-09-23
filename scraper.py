@@ -194,6 +194,7 @@ def main():
                             mail_html += item["htmlContent"]
                         mail_html += "</dl><hr>"
                     mail_html += f"<p><a href='{site_url}'>サイトを確認する</a></p>"
+                    mail_html += f"<p><a href='https://philovec.github.io/web_observation/'>新着情報一覧はこちら</a></p>"
                     send_email_via_gas(email, f"【新着通知】{site_name}", mail_html)
 
                 # GitHub Pages用データ追加
