@@ -101,7 +101,7 @@ def main():
             date_sel = clean_selector(config.get("dateSelector"))
             content_sel = clean_selector(config.get("contentSelector"))
             
-            display_days = config.get("displayDays", 30)
+            display_days = config.get("displayDays", 0)
             email = config.get("email")
 
             print(f"\n🔍 解析中: [{site_name}] ({site_url})")
@@ -137,12 +137,15 @@ def main():
                     parsed_items = []
 
                     for item in items:
-                        date_el = item.select_one(date_sel)
+                        # date_sel が設定されていない場合も考慮
+                        date_el = item.select_one(date_sel) if date_sel else None
                         content_el = item.select_one(content_sel)
 
-                        if date_el and content_el:
-                            date_text = date_el.get_text(strip=True)
-                            date_obj = parse_date(date_text)
+                        # 日付要素がなくても、コンテンツ要素があれば抽出する
+                        if content_el:
+                            # ご提示のような複数divで改行が含まれる場合を考慮し、空白で連結して取得
+                            date_text = date_el.get_text(separator=" ", strip=True) if date_el else ""
+                            date_obj = parse_date(date_text) if date_text else None
 
                             # 相対パスを絶対パスに変換
                             for a in content_el.find_all("a", href=True):
@@ -152,10 +155,13 @@ def main():
 
                             item_id = f"{date_text}_{content_el.get_text(strip=True)[:30]}"
                             
+                            # 日付テキストがない場合は「日付なし」や空文字にするなどのフォールバック
+                            dt_content = date_text if date_text else "日付なし"
+                            
                             parsed_items.append({
                                 "id": item_id,
                                 "dateObj": date_obj,
-                                "htmlContent": f"<dt>{date_text}</dt><dd>{content_el.decode_contents()}</dd>"
+                                "htmlContent": f"<dt>{dt_content}</dt><dd>{content_el.decode_contents()}</dd>"
                             })
 
                     if parsed_items:
@@ -245,7 +251,7 @@ def generate_github_pages_html(sites_data):
         
         has_recent = False
         for cat_name, items in site["groupedData"].items():
-            recent_items = [i for i in items if i["dateObj"] and i["dateObj"] >= threshold]
+            recent_items = [i for i in items if not i["dateObj"] or i["dateObj"] >= threshold]
             
             if recent_items:
                 has_recent = True
